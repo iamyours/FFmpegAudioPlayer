@@ -10,7 +10,18 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="解码"
         android:onClick="decodeAudio"
-        />
+        android:text="解码" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="mixAudio"
+        android:text="混音" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="openSLESPlay"
+        android:text="OpenSL ES播放" />
 </LinearLayout>

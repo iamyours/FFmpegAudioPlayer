@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.4.1)
+# 查找当前目录下的所有源文件，并保存到 DIR_LIB_SRCS 变量
+aux_source_directory(src/main/cpp/ DIR_LIB_SRCS)
+
 add_library( native-lib
              SHARED
-             src/main/cpp/native-lib.cpp)
+             ${DIR_LIB_SRCS})
+
 find_library( log-lib
               log )
 find_library( android-lib

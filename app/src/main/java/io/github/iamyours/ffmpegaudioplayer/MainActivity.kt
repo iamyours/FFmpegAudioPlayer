@@ -18,7 +18,26 @@ class MainActivity : AppCompatActivity() {
         decodeAudio(src, out)
     }
 
+    fun mixAudio(v: View) {
+        val path = "${Environment.getExternalStorageDirectory()}/test"
+        val srcs = arrayOf(
+                "$path/a.mp3",
+                "$path/b.mp3",
+                "$path/c.mp3",
+                "$path/d.mp3"
+        )
+        mixAudio(srcs, "$path/mix.pcm")
+    }
+
+    fun openSLESPlay(v: View) {
+        val path = "${Environment.getExternalStorageDirectory()}"
+        openslesTest("$path/test1.mp3")
+    }
+
+    external fun mixAudio(srcs: Array<String>, out: String)
     external fun decodeAudio(src: String, out: String)
+    external fun openslesTest(src: String)
+
     companion object {
         init {
             System.loadLibrary("avutil-55")
