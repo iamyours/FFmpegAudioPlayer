@@ -3,6 +3,20 @@ package io.github.iamyours.ffmpegaudioplayer
 class FFmpegAudioPlayer {
     external fun init(paths: Array<String>)
     external fun play()
+    /**
+     * 修改每个音量
+     */
+    external fun changeVolumes(volumes: Array<String>)
+
+    /**
+     * 变速
+     */
+    external fun changeTempo(tempo: String)
+
+    external fun duration(): Double
+
+    external fun position(): Double
+
     companion object {
         init {
             System.loadLibrary("avutil-55")

@@ -1,5 +1,6 @@
 package io.github.iamyours.ffmpegaudioplayer
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
@@ -30,6 +31,11 @@ class MainActivity : AppCompatActivity() {
         )
 
         mixAudio(srcs, "$path/mix.pcm")
+    }
+
+    fun toPlay(v: View) {
+        val intent = Intent(this, FFmpegPlayerActivity::class.java)
+        startActivity(intent)
     }
 
 
