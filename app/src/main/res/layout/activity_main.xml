@@ -24,4 +24,9 @@
         android:layout_height="wrap_content"
         android:onClick="openSLESPlay"
         android:text="OpenSL ES播放" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="playMultiAudio"
+        android:text="多音轨播放" />
 </LinearLayout>

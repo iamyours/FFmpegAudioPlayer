@@ -7,9 +7,11 @@ import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+    lateinit var player: FFmpegAudioPlayer
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        player = FFmpegAudioPlayer();
     }
 
     fun decodeAudio(v: View) {
@@ -26,12 +28,32 @@ class MainActivity : AppCompatActivity() {
                 "$path/c.mp3",
                 "$path/d.mp3"
         )
+
         mixAudio(srcs, "$path/mix.pcm")
     }
+
 
     fun openSLESPlay(v: View) {
         val path = "${Environment.getExternalStorageDirectory()}"
         openslesTest("$path/test1.mp3")
+    }
+
+    fun playMultiAudio(v: View) {
+        val path = "${Environment.getExternalStorageDirectory()}/test"
+        val srcs = arrayOf(
+                "$path/a.mp3",
+                "$path/b.mp3",
+                "$path/c.mp3",
+                "$path/d.mp3"
+        )
+        var srcs2 = arrayOf(
+                "${Environment.getExternalStorageDirectory()}/test1.mp3"
+        )
+        var srcs3 = arrayOf(
+                "$path/Timetravel.mp3"
+        )
+        player.init(srcs3)
+        player.play()
     }
 
     external fun mixAudio(srcs: Array<String>, out: String)

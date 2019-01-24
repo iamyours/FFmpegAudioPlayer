@@ -4,7 +4,7 @@ aux_source_directory(src/main/cpp/ DIR_LIB_SRCS)
 
 add_library( native-lib
              SHARED
-             ${DIR_LIB_SRCS})
+             ${DIR_LIB_SRCS} )
 
 find_library( log-lib
               log )
