@@ -39,6 +39,7 @@ public:
     AVFilterContext *sink;          //输出filter
     char **volumes;                 //各个音频的音量
     char *tempo;                    //播放速度0.5~2.0
+    int change = 0;
 
 //AVFrame队列
     std::vector<AVFrame *> queue;   //队列，用于保存解码过滤后的AVFrame
@@ -68,6 +69,8 @@ public:
     pthread_mutex_t mutex;          //同步锁
     pthread_cond_t not_full;        //不为满条件，生产AVFrame时使用
     pthread_cond_t not_empty;       //不为空条件，消费AVFrame时使用
+    pthread_cond_t filter_changed;  //过滤器修改
+    pthread_mutex_t filter_mutex;
 
 //Open SL ES
     SLObjectItf engineObject;       //引擎对象

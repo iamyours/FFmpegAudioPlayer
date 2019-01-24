@@ -3,6 +3,7 @@
 //
 
 #include "AudioPlayer.h"
+#include <unistd.h>
 
 void _playCallback(SLAndroidSimpleBufferQueueItf bq, void *context) {
     AudioPlayer *player = (AudioPlayer *) context;
@@ -30,8 +31,10 @@ AudioPlayer::AudioPlayer(char **pathArr, int len) {
     tempo = "1.0";
 
     pthread_mutex_init(&mutex, NULL);
+    pthread_mutex_init(&filter_mutex, NULL);
     pthread_cond_init(&not_full, NULL);
     pthread_cond_init(&not_empty, NULL);
+    pthread_cond_init(&filter_changed, NULL);
 
     initCodecs(pathArr);
     avfilter_register_all();
@@ -77,7 +80,7 @@ AVFrame *AudioPlayer::get() {
             if (queue.size() < 5)pthread_cond_signal(&not_full);
             pthread_mutex_unlock(&mutex);
             current_time = av_q2d(time_base) * out->pts;
-            LOGI("get frame:%d,time:%lf", queue.size(), current_time);
+            LOGI("get frame:%d,time:%lf,change:%d", queue.size(), current_time, change);
             return out;
         }
     }
@@ -94,6 +97,9 @@ void AudioPlayer::decodeAudio() {
     int index = 0;
     while (isPlay) {
         LOGI("decode frame:%d", index);
+        if (change) {
+            initFilters();
+        }
         for (int i = 0; i < fileCount; i++) {
             AVFormatContext *fmt_ctx = fmt_ctx_arr[i];
             ret = av_read_frame(fmt_ctx, packet);
@@ -120,7 +126,7 @@ void AudioPlayer::decodeAudio() {
         LOGI("time:%lld,%lld,%lld", frame->pkt_dts, frame->pts, packet->pts);
         while (av_buffersink_get_frame(sink, frame) >= 0) {
             frame->pts = packet->pts;
-            LOGI("put frame:%d,%lld", index, frame->pts);
+            LOGI("put frame:%d,%lld,change:%d", index, frame->pts, change);
             put(frame);
         }
         index++;
@@ -231,7 +237,9 @@ int AudioPlayer::initSwrContext() {
 
 int AudioPlayer::initFilters() {
     LOGI("init filters");
+    if (change)avfilter_graph_free(&graph);
     graph = avfilter_graph_alloc();
+
     srcs = (AVFilterContext **) malloc(fileCount * sizeof(AVFilterContext **));
     char args[128];
     AVDictionary *dic = NULL;
@@ -319,7 +327,8 @@ int AudioPlayer::initFilters() {
         LOGE("error config graph");
         return -1;
     }
-
+    LOGI("init filter success");
+    change = 0;
     return 1;
 }
 
