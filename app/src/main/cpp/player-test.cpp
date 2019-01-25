@@ -54,6 +54,29 @@ Java_io_github_iamyours_ffmpegaudioplayer_FFmpegAudioPlayer_play(
     player->play();
 }
 
+extern "C" JNIEXPORT void
+JNICALL
+Java_io_github_iamyours_ffmpegaudioplayer_FFmpegAudioPlayer_pause(
+        JNIEnv *env,
+        jobject /* this */) {
+    player->pause();
+}
+
+extern "C" JNIEXPORT void
+JNICALL
+Java_io_github_iamyours_ffmpegaudioplayer_FFmpegAudioPlayer_release(
+        JNIEnv *env,
+        jobject /* this */) {
+    player->release();
+}
+extern "C" JNIEXPORT void
+JNICALL
+Java_io_github_iamyours_ffmpegaudioplayer_FFmpegAudioPlayer_seek(
+        JNIEnv *env,
+        jobject /* this */, jdouble secs) {
+    player->seek(secs);
+}
+
 extern "C" JNIEXPORT jdouble
 JNICALL
 Java_io_github_iamyours_ffmpegaudioplayer_FFmpegAudioPlayer_duration(

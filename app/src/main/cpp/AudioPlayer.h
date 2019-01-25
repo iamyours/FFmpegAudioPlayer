@@ -60,7 +60,7 @@ public:
 // 进度相关
     AVRational time_base;           //刻度，用于计算进度
     double total_time;              //总时长（秒)
-    double_t current_time;          //当前进度
+    double current_time = 0;          //当前进度
     int isPlay = 0;                 //播放状态1：播放中
 
 //多线程
@@ -69,8 +69,6 @@ public:
     pthread_mutex_t mutex;          //同步锁
     pthread_cond_t not_full;        //不为满条件，生产AVFrame时使用
     pthread_cond_t not_empty;       //不为空条件，消费AVFrame时使用
-    pthread_cond_t filter_changed;  //过滤器修改
-    pthread_mutex_t filter_mutex;
 
 //Open SL ES
     SLObjectItf engineObject;       //引擎对象
@@ -81,6 +79,8 @@ public:
     SLAndroidSimpleBufferQueueItf bufferQueueItf;   //缓冲接口
 
     void play();
+
+    void pause();
 
     void setPlaying();
 
@@ -96,6 +96,9 @@ public:
 
     int put(AVFrame *frame);
 
+    void seek(double secs);
+
+    void release();
 };
 
 }

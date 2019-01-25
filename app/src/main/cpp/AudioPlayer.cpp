@@ -31,10 +31,8 @@ AudioPlayer::AudioPlayer(char **pathArr, int len) {
     tempo = "1.0";
 
     pthread_mutex_init(&mutex, NULL);
-    pthread_mutex_init(&filter_mutex, NULL);
     pthread_cond_init(&not_full, NULL);
     pthread_cond_init(&not_empty, NULL);
-    pthread_cond_init(&filter_changed, NULL);
 
     initCodecs(pathArr);
     avfilter_register_all();
@@ -134,14 +132,14 @@ void AudioPlayer::decodeAudio() {
     end:
     av_packet_unref(packet);
     av_frame_unref(frame);
-    pthread_exit(0);
-
+    isPlay = 0;
 }
 
 
 void *_decodeAudio(void *args) {
     AudioPlayer *p = (AudioPlayer *) args;
     p->decodeAudio();
+    pthread_exit(0);
 }
 
 void *_play(void *args) {
@@ -158,10 +156,18 @@ void AudioPlayer::setPlaying() {
 
 void AudioPlayer::play() {
     LOGI("play...");
-
+    if (isPlay) {
+        (*playItf)->SetPlayState(playItf, SL_PLAYSTATE_PLAYING);
+        return;
+    }
     isPlay = 1;
+    seek(0);
     pthread_create(&decodeId, NULL, _decodeAudio, this);
     pthread_create(&playId, NULL, _play, this);
+}
+
+void AudioPlayer::pause() {
+    (*playItf)->SetPlayState(playItf, SL_PLAYSTATE_PAUSED);
 }
 
 int AudioPlayer::createPlayer() {
@@ -396,5 +402,51 @@ int AudioPlayer::initCodecs(char **pathArr) {
         }
     }
     return 1;
+}
+
+void AudioPlayer::seek(double secs) {
+    pthread_mutex_lock(&mutex);
+    for (int i = 0; i < fileCount; i++) {
+        av_seek_frame(fmt_ctx_arr[i], stream_index_arr[i], (int64_t) (secs / av_q2d(time_base)),
+                      AVSEEK_FLAG_ANY);
+    }
+    current_time = secs;
+    queue.clear();
+    pthread_cond_signal(&not_full);
+    pthread_mutex_unlock(&mutex);
+}
+
+void AudioPlayer::release() {
+    pthread_mutex_lock(&mutex);
+    isPlay = 0;
+    pthread_cond_signal(&not_full);
+    pthread_mutex_unlock(&mutex);
+    if (playItf)(*playItf)->SetPlayState(playItf, SL_PLAYSTATE_STOPPED);
+    if (playerObject) {
+        (*playerObject)->Destroy(playerObject);
+        playerObject = 0;
+        bufferQueueItf = 0;
+    }
+    if (mixObject) {
+        (*mixObject)->Destroy(mixObject);
+        mixObject = 0;
+    }
+    if (engineObject) {
+        (*engineObject)->Destroy(engineObject);
+        engineItf = 0;
+    }
+    if (swr_ctx) {
+        swr_free(&swr_ctx);
+    }
+    if (graph) {
+        avfilter_graph_free(&graph);
+    }
+    for (int i = 0; i < fileCount; i++) {
+        avcodec_close(codec_ctx_arr[i]);
+        avformat_close_input(&fmt_ctx_arr[i]);
+    }
+    free(codec_ctx_arr);
+    free(fmt_ctx_arr);
+    LOGI("release...");
 }
 

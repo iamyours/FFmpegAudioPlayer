@@ -33,7 +33,9 @@ class FFmpegPlayerActivity : AppCompatActivity() {
             override fun handleMessage(msg: Message?) {
                 val text = "${player.position()}/${player.duration()}"
                 tv_time.text = text
-                sendEmptyMessageDelayed(1,500)
+                val progress = player.position() * 10000 / player.duration()
+                sb_progress.progress = progress.toInt()
+                sendEmptyMessageDelayed(1, 500)
             }
         }.sendEmptyMessageDelayed(1, 500)
     }
@@ -42,6 +44,20 @@ class FFmpegPlayerActivity : AppCompatActivity() {
 
 
     private fun initListeners() {
+        sb_progress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                val duration = player.duration()
+                val current = duration * seekBar.progress / seekBar.max
+                player.seek(current)
+            }
+        })
         tvs = arrayOf(tv_value1, tv_value2, tv_value3, tv_value4)
         val seekBars = arrayOf(sb1, sb2, sb3, sb4)
         seekBars.forEachIndexed { index, seekBar ->
@@ -78,6 +94,9 @@ class FFmpegPlayerActivity : AppCompatActivity() {
         btn_play.setOnClickListener {
             player.play()
         }
+        btn_pause.setOnClickListener {
+            player.pause()
+        }
     }
 
     private fun changeVolumes() {
@@ -86,5 +105,10 @@ class FFmpegPlayerActivity : AppCompatActivity() {
         }
         player.changeVolumes(volumes)
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        player.release()
     }
 }

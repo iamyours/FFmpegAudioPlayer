@@ -194,4 +194,13 @@
         android:layout_margin="30dp"
         android:text="播放"
         app:layout_constraintTop_toBottomOf="@id/tv5" />
+    <Button
+        android:id="@+id/btn_pause"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="暂停"
+        app:layout_constraintLeft_toLeftOf="@id/btn_play"
+        app:layout_constraintRight_toRightOf="@id/btn_play"
+        app:layout_constraintTop_toBottomOf="@id/btn_play"
+        />
 </android.support.constraint.ConstraintLayout>
