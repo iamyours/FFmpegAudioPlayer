@@ -9,7 +9,7 @@ extern "C" JNIEXPORT void
 JNICALL
 Java_io_github_iamyours_ffmpegaudioplayer_FFmpegAudioPlayer_init(
         JNIEnv *env,
-        jobject /* this */, jobjectArray _srcs) {
+        jobject thiz, jobjectArray _srcs) {
 //将java传入的字符串数组转为c字符串数组
     jsize len = env->GetArrayLength(_srcs);
     char **pathArr = (char **) malloc(len * sizeof(char *));
@@ -19,6 +19,18 @@ Java_io_github_iamyours_ffmpegaudioplayer_FFmpegAudioPlayer_init(
         pathArr[i] = const_cast<char *>(env->GetStringUTFChars(str, 0));
     }
     player = new AudioPlayer(pathArr, len);
+    player->env = env;
+    player->jobj = thiz;
+}
+
+extern "C" JNIEXPORT void
+JNICALL
+Java_io_github_iamyours_ffmpegaudioplayer_FFmpegAudioPlayer_callback(
+        JNIEnv *env,
+        jobject thiz, jobject callback) {
+    jclass callbackClass = env->GetObjectClass(callbackClass);
+    jmethodID method = env->GetMethodID(callbackClass, "test", "()V");
+    env->CallVoidMethod(callback, method);
 }
 
 extern "C" JNIEXPORT void

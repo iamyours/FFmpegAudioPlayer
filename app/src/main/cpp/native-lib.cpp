@@ -89,8 +89,8 @@ Java_io_github_iamyours_ffmpegaudioplayer_MainActivity_decodeAudio(
     av_register_all();//注册所有容器解码器
     AVFormatContext *fmt_ctx = avformat_alloc_context();
 
-    if (avformat_open_input(&fmt_ctx, src, NULL, NULL) < 0) {//打开文件
-        LOGE("open file error");
+    if (avformat_open_input(&fmt_ctx, "/test1.mp3", NULL, NULL) < 0) {//打开文件
+        LOGE("open file error:%s",src);
         return;
     }
     if (avformat_find_stream_info(fmt_ctx, NULL) < 0) {//读取音频格式文件信息
@@ -173,8 +173,9 @@ Java_io_github_iamyours_ffmpegaudioplayer_MainActivity_decodeAudio(
 //                           out_file); //想将单个声道pcm数据写入文件
                     swr_convert(swr_ctx, &out_buffer, MAX_AUDIO_SIZE,
                                 (const uint8_t **) frame->data, frame->nb_samples);
-                    int out_size = av_samples_get_buffer_size(NULL,out_ch_layout_nb,frame->nb_samples,out_sample_fmt,0);
-                    fwrite(out_buffer,1,out_size,out_file);
+                    int out_size = av_samples_get_buffer_size(NULL, out_ch_layout_nb,
+                                                              frame->nb_samples, out_sample_fmt, 0);
+                    fwrite(out_buffer, 1, out_size, out_file);
                 }
             }
         }

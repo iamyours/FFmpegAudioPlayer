@@ -26,7 +26,8 @@ class AudioPlayer {
 public:
     AudioPlayer(char **pathArr, int len);
 
-
+    jobject jobj;
+    JNIEnv *env;
 //解码
     int fileCount;                  //输入音频文件数量
     AVFormatContext **fmt_ctx_arr;  //FFmpeg上下文数组
@@ -37,6 +38,7 @@ public:
     AVFilterGraph *graph;
     AVFilterContext **srcs;         //输入filter
     AVFilterContext *sink;          //输出filter
+    AVFilterContext **volumeCtxs;
     char **volumes;                 //各个音频的音量
     char *tempo;                    //播放速度0.5~2.0
     int change = 0;
@@ -99,6 +101,8 @@ public:
     void seek(double secs);
 
     void release();
+
+    void updateFilters();
 };
 
 }

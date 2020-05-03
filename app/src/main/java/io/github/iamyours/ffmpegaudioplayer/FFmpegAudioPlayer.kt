@@ -5,6 +5,7 @@ class FFmpegAudioPlayer {
      * 初始化
      */
     external fun init(paths: Array<String>)
+
     /**
      * 播放
      */
@@ -44,6 +45,8 @@ class FFmpegAudioPlayer {
      * 进度跳转
      */
     external fun seek(sec: Double)
+
+    external fun callback(callback: Callback)
 
     companion object {
         init {

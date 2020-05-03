@@ -87,6 +87,26 @@ AVFrame *AudioPlayer::get() {
 }
 
 
+void AudioPlayer::updateFilters() {
+    AVDictionary *dic = NULL;
+    for (int i = 0; i < fileCount; i++) {
+        AVFilterContext *src = srcs[i];
+        AVFilterContext *volumeCtx = src->outputs[0]->dst->outputs[0]->dst;
+        av_dict_set(&dic, "volume", volumes[i], 0);
+        if (avfilter_init_dict(volumeCtx, &dic) < 0) {
+            LOGE("error init volume filter");
+        }
+        const char *name2 = volumeCtx->filter->name;
+        AVFilterContext *tempo = volumeCtx->outputs[0]->dst->outputs[0]->dst;
+//        LOGE("filter name2:%s", name2);
+//        LOGE("filter name3:%s", tempo->filter->name);
+        av_dict_free(&dic);
+    }
+    if (avfilter_graph_config(graph, NULL) < 0) {
+        LOGE("error config graph");
+    }
+}
+
 void AudioPlayer::decodeAudio() {
     LOGI("start decode...");
     AVFrame *frame = av_frame_alloc();
@@ -96,7 +116,8 @@ void AudioPlayer::decodeAudio() {
     while (isPlay) {
         LOGI("decode frame:%d", index);
         if (change) {
-            initFilters();
+//            initFilters();
+            updateFilters();
         }
         for (int i = 0; i < fileCount; i++) {
             AVFormatContext *fmt_ctx = fmt_ctx_arr[i];
@@ -247,6 +268,8 @@ int AudioPlayer::initFilters() {
     graph = avfilter_graph_alloc();
 
     srcs = (AVFilterContext **) malloc(fileCount * sizeof(AVFilterContext **));
+    volumeCtxs = (AVFilterContext **) malloc(fileCount * sizeof(AVFilterContext **));
+
     char args[128];
     AVDictionary *dic = NULL;
     //混音过滤器
@@ -275,10 +298,13 @@ int AudioPlayer::initFilters() {
         AVFilter *volume = avfilter_get_by_name("volume");
         AVFilterContext *volume_ctx = avfilter_graph_alloc_filter(graph, volume, "volume");
         av_dict_set(&dic, "volume", volumes[i], 0);
+
         if (avfilter_init_dict(volume_ctx, &dic) < 0) {
             LOGE("error init volume filter");
             return -1;
         }
+        volumeCtxs[i] = volume_ctx;
+
         //将输入端链接到volume过滤器
         if (avfilter_link(srcs[i], 0, volume_ctx, 0) < 0) {
             LOGE("error link to volume filter");
@@ -337,6 +363,7 @@ int AudioPlayer::initFilters() {
     change = 0;
     return 1;
 }
+
 
 int AudioPlayer::initCodecs(char **pathArr) {
     LOGI("init codecs");

@@ -4,20 +4,43 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.view.View
+import com.yanzhenjie.permission.AndPermission
+import com.yanzhenjie.permission.runtime.Permission
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
     lateinit var player: FFmpegAudioPlayer
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        player = FFmpegAudioPlayer();
+        player = FFmpegAudioPlayer()
+        AndPermission.with(this)
+                .runtime()
+                .permission(Permission.Group.STORAGE)
+                .onGranted {
+                    copyFiles()
+                }.start()
+    }
+
+    private fun copyFiles() {
+        val srcs = arrayOf("a.mp3", "b.mp3", "c.mp3", "d.mp3", "test1.mp3", "TimeTravel.mp3")
+        val outDir = "${Environment.getExternalStorageDirectory()}/test/"
+        val file = File(outDir)
+        if (!file.exists()) file.mkdirs()
+        srcs.forEach {
+            val out = "$outDir$it"
+            if (!File(out).exists()) {
+                FileUtil.copyFromAssets(this, it, out)
+            }
+        }
     }
 
     fun decodeAudio(v: View) {
-        val src = "${Environment.getExternalStorageDirectory()}/test1.mp3"
-        val out = "${Environment.getExternalStorageDirectory()}/out2.pcm"
+        val src = "${Environment.getExternalStorageDirectory()}/test/test1.mp3"
+        val out = "${Environment.getExternalStorageDirectory()}/test/out2.pcm"
         decodeAudio(src, out)
     }
 
@@ -40,8 +63,11 @@ class MainActivity : AppCompatActivity() {
 
 
     fun openSLESPlay(v: View) {
-        val path = "${Environment.getExternalStorageDirectory()}"
-        openslesTest("$path/test1.mp3")
+        val path = "${Environment.getExternalStorageDirectory()}/test"
+        val src = "$path/TimeTravel.mp3"
+        val exist = File(src).exists()
+        Log.e("Main", "exist:$exist")
+        openslesTest(src)
     }
 
     fun playMultiAudio(v: View) {
@@ -52,13 +78,8 @@ class MainActivity : AppCompatActivity() {
                 "$path/c.mp3",
                 "$path/d.mp3"
         )
-        var srcs2 = arrayOf(
-                "${Environment.getExternalStorageDirectory()}/test1.mp3"
-        )
-        var srcs3 = arrayOf(
-                "$path/Timetravel.mp3"
-        )
-        player.init(srcs3)
+
+        player.init(srcs)
         player.play()
     }
 

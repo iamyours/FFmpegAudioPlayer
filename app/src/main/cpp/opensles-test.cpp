@@ -89,16 +89,20 @@ void playCallback(SLAndroidSimpleBufferQueueItf bq, void *args) {
 
 void *decodeAudio(void *args) {
     char *path = (char *) args;
+    LOGI("start decode...%s", path);
     av_register_all();
-    AVFormatContext *fmt_ctx;
+    LOGI("av_register_all...")
+    AVFormatContext *fmt_ctx = avformat_alloc_context();
     if (avformat_open_input(&fmt_ctx, path, NULL, NULL) < 0) {
         LOGE("error open file:%s", path);
         return NULL;
     }
+    LOGI("open file:%s", path);
     if (avformat_find_stream_info(fmt_ctx, NULL) < 0) {
         LOGE("error find stream info");
         return NULL;
     }
+    LOGI("find stream info");
     //获取音频索引
     int audio_stream_index = -1;
     for (int i = 0; i < fmt_ctx->nb_streams; i++) {
@@ -166,14 +170,15 @@ JNICALL Java_io_github_iamyours_ffmpegaudioplayer_MainActivity_openslesTest(JNIE
                                                                             jstring _path) {
 
 //初始化同步锁和条件变量
-pthread_mutex_init(&mutex, NULL);
-pthread_cond_init(&notfull, NULL);
-pthread_cond_init(&notempty, NULL);
+    pthread_mutex_init(&mutex, NULL);
+    pthread_cond_init(&notfull, NULL);
+    pthread_cond_init(&notempty, NULL);
 
 //初始化解码线程
-pthread_t pid;
-char *path = (char *) env->GetStringUTFChars(_path, 0);
-pthread_create(&pid, NULL, decodeAudio, path);
+    pthread_t pid;
+    char *path = (char *) env->GetStringUTFChars(_path, 0);
+    LOGI("openslesTest:%s", path)
+    pthread_create(&pid, NULL, decodeAudio, path);
 
 
     //创建播放器
