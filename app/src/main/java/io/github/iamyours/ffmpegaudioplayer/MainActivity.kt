@@ -56,6 +56,12 @@ class MainActivity : AppCompatActivity() {
         mixAudio(srcs, "$path/mix.pcm")
     }
 
+    fun encodeAudio(v: View) {
+        val src = "${Environment.getExternalStorageDirectory()}/test/mix.pcm"
+        val out = "${Environment.getExternalStorageDirectory()}/test/mix.mp3"
+        encodeAudio(src, out)
+    }
+
     fun toPlay(v: View) {
         val intent = Intent(this, FFmpegPlayerActivity::class.java)
         startActivity(intent)
@@ -86,6 +92,7 @@ class MainActivity : AppCompatActivity() {
     external fun mixAudio(srcs: Array<String>, out: String)
     external fun decodeAudio(src: String, out: String)
     external fun openslesTest(src: String)
+    external fun encodeAudio(str: String, out: String)
 
     companion object {
         init {

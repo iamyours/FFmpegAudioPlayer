@@ -18,6 +18,11 @@
         android:layout_height="wrap_content"
         android:onClick="mixAudio"
         android:text="混音" />
+    <Button
+        android:layout_width="match_parent"
+        android:text="编码"
+        android:onClick="encodeAudio"
+        android:layout_height="wrap_content" />
 
     <Button
         android:layout_width="match_parent"
