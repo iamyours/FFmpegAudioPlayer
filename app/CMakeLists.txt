@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 # 查找当前目录下的所有源文件，并保存到 DIR_LIB_SRCS 变量
 aux_source_directory(src/main/cpp/ DIR_LIB_SRCS)
-
+add_definitions(-w)
 add_library( native-lib
              SHARED
              ${DIR_LIB_SRCS} )
@@ -48,7 +48,7 @@ set_target_properties( avformat-57
                        PROPERTIES IMPORTED_LOCATION
                        ${distribution_DIR}/libavformat-57.so)
 set(CMAKE_VERBOSE_MAKEFILE on)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++11 -Wno-deprecated-declarations")
 include_directories(src/main/cpp)
 include_directories(src/main/jniLibs/include)
 

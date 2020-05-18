@@ -1,14 +1,13 @@
 package io.github.iamyours.ffmpegaudioplayer
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
-import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -87,6 +86,10 @@ class MainActivity : AppCompatActivity() {
 
         player.init(srcs)
         player.play()
+    }
+
+    fun showWave(v: View) {
+        startActivity(Intent(this, WavePlayerActivity::class.java))
     }
 
     external fun mixAudio(srcs: Array<String>, out: String)

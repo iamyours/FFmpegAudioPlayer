@@ -39,4 +39,9 @@
         android:layout_height="wrap_content"
         android:onClick="toPlay"
         android:text="多音轨播放详情" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="showWave"
+        android:text="波形显示" />
 </LinearLayout>
