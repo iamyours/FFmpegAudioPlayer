@@ -8,4 +8,4 @@
      (多种AVFilter综合组合使用,实现音频变速，调音，多音轨合成实时播放)
 - [x] **音频波形显示**
     (Visualizer替代方案，避免需要录音权限)
-- [-] **录音编码** (libmp3lame+FFmpeg交叉编译，使用FFmpeg实现实时录音编码成mp3)
+- [ ] **录音编码** (libmp3lame+FFmpeg交叉编译，使用FFmpeg实现实时录音编码成mp3)
